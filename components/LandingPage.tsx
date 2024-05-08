@@ -57,6 +57,7 @@ const LandingPage = () => {
                     </div>
                 ))
             }
+            {recipes.length === 0 && <p>No recipes found. Re-check spelling.</p>}
         </>
     )
 }
