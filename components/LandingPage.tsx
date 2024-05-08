@@ -3,7 +3,7 @@
 import React, {useState} from "react";
 import {getRecipesByIngredient} from "@/app/actions";
 
-interface Response {
+export interface Response {
     hits: Hit[]
 }
 
