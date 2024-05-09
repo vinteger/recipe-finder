@@ -19,6 +19,7 @@ interface Recipe  {
 const LandingPage = () => {
     const [ingredient, setIngredient] = useState("")
     const [recipes, setRecipes] = useState<Recipe[]>([])
+    const [noRecipeFoundMessage, setNoRecipeFoundMessage] = useState(false)
 
     const handleIngredientInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setIngredient(e.target.value)
@@ -27,7 +28,7 @@ const LandingPage = () => {
     const getRecipes = async () => {
         const response: Response = await getRecipesByIngredient(ingredient)
 
-        if (response && response.hits) {
+        if (response && response.hits.length > 0) {
             const retrievedRecipes = response.hits.map( (hit: Hit) => {
                 return {
                     label: hit.recipe.label,
@@ -35,6 +36,8 @@ const LandingPage = () => {
                 }
             })
             setRecipes(retrievedRecipes)
+        } else {
+            setNoRecipeFoundMessage(true)
         }
     }
 
@@ -57,7 +60,7 @@ const LandingPage = () => {
                     </div>
                 ))
             }
-            {recipes.length === 0 && <p>No recipes found. Re-check spelling.</p>}
+            {noRecipeFoundMessage && <p>No recipes found. Re-check spelling.</p>}
         </>
     )
 }

@@ -11,27 +11,42 @@ jest.mock("../app/actions", () => ({
 
 
 describe("Landing Page", () => {
-    it("should render an input field", () => {
+
+    beforeEach(() => {
+        jest.resetAllMocks()
+    })
+
+    it("should render initial page", () => {
         render(<LandingPage/>)
 
         expect(screen.getByRole("textbox")).toBeInTheDocument()
         expect(screen.getByRole("button")).toHaveTextContent("Search")
-    })
-
-    it("should look for recipes on button click", async () => {
-        const  user = userEvent.setup()
-        render(<LandingPage/>)
-
-        await user.click(screen.getByRole("button", {name: "Search"}))
-
-        expect(getRecipesByIngredient).toHaveBeenCalledTimes(1)
-
+        expect(screen.queryByText("No recipes found. Re-check spelling.")).not.toBeInTheDocument()
     })
 
     it("should display a message if no recipes are found", async () => {
-        mockActions.getRecipesByIngredient.mockResolvedValueOnce([])
+        const  user = userEvent.setup()
+        mockActions.getRecipesByIngredient.mockResolvedValueOnce({hits: []})
         render(<LandingPage/>)
 
+        await user.type(screen.getByRole("textbox"), "some ingredient")
+        await user.click(screen.getByRole("button", {name: "Search"}))
+
         expect(screen.getByText("No recipes found. Re-check spelling.")).toBeInTheDocument()
+    })
+
+    it("should display recipes after search", async () => {
+        const  user = userEvent.setup()
+        mockActions.getRecipesByIngredient.mockResolvedValueOnce({
+            hits: [{recipe: {label: "testLabel", image: "testImage"}}]
+        })
+
+        render(<LandingPage/>)
+
+        await user.type(screen.getByRole("textbox"), "testLabel")
+        await user.click(screen.getByRole("button", {name: "Search"}))
+
+        expect(getRecipesByIngredient).toHaveBeenCalledTimes(1)
+        expect(await screen.findByText("testLabel")).toBeInTheDocument()
     })
 })
