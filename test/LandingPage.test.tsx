@@ -19,7 +19,9 @@ describe("Landing Page", () => {
     it("should render initial page", () => {
         render(<LandingPage/>)
 
-        expect(screen.getByRole("textbox")).toBeInTheDocument()
+        expect(screen.getByRole("heading", {name: "Recipe Finder"})).toBeInTheDocument()
+        expect(screen.getByText("Enter ingredients")).toBeInTheDocument()
+        expect(screen.getByPlaceholderText("lettuce, tomatoes")).toBeInTheDocument()
         expect(screen.getByRole("button")).toHaveTextContent("Search")
         expect(screen.queryByText(NO_RECIPES_FOUND)).not.toBeInTheDocument()
     })
@@ -40,13 +42,72 @@ describe("Landing Page", () => {
         const label = "chicken";
 
         mockActions.getRecipesByIngredient.mockResolvedValueOnce({
-            hits: [{recipe: {label, image: "testImage"}}]
+            hits: [{recipe: {label, image: "https://localhost:3000/testImage"}}]
         })
 
         render(<LandingPage/>)
 
         await user.type(screen.getByRole("textbox"), "some ingredient")
         await user.click(screen.getByRole("button", {name: "Search"}))
+
+        expect(getRecipesByIngredient).toHaveBeenCalledTimes(1)
+        expect(await screen.findByText(label)).toBeInTheDocument()
+    })
+
+    it("should clear 'no recipes found' message after successful search", async () => {
+        const  user = userEvent.setup()
+        mockActions.getRecipesByIngredient.mockResolvedValueOnce({hits: []})
+
+        render(<LandingPage/>)
+
+        await user.click(screen.getByRole("button", {name: "Search"}))
+        expect(screen.getByText(NO_RECIPES_FOUND)).toBeInTheDocument()
+
+        mockActions.getRecipesByIngredient.mockResolvedValueOnce({
+            hits: [{recipe: {label: "label", image: "https://localhost:3000/testImage"}}]
+        })
+        await user.type(screen.getByRole("textbox"), "some ingredient")
+        await user.click(screen.getByRole("button", {name: "Search"}))
+
+        expect(screen.queryByText(NO_RECIPES_FOUND)).not.toBeInTheDocument()
+    })
+
+    it("should clear previous search after new search", async () => {
+        const  user = userEvent.setup()
+        mockActions.getRecipesByIngredient.mockResolvedValueOnce({
+            hits: [{recipe: {label: "first", image: "https://localhost:3000/testImage"}}]
+        })
+
+        render(<LandingPage/>)
+
+        const ingredientSearchInput = screen.getByRole("textbox")
+        await user.type(ingredientSearchInput, "some ingredient")
+        await user.click(screen.getByRole("button", {name: "Search"}))
+
+        expect(screen.getByText("first")).toBeInTheDocument()
+
+        mockActions.getRecipesByIngredient.mockResolvedValueOnce({
+            hits: []
+        })
+
+        await user.clear(ingredientSearchInput)
+        await user.click(screen.getByRole("button", {name: "Search"}))
+
+        expect(screen.getByText(NO_RECIPES_FOUND)).toBeInTheDocument()
+        expect(screen.queryByText("first")).not.toBeInTheDocument()
+    })
+
+    it("should submit on Enter key press while focused on input", async () => {
+        const  user = userEvent.setup()
+        const label = "chicken";
+
+        mockActions.getRecipesByIngredient.mockResolvedValueOnce({
+            hits: [{recipe: {label, image: "https://localhost:3000/testImage"}}]
+        })
+
+        render(<LandingPage/>)
+
+        await user.type(screen.getByRole("textbox"), "some ingredient{Enter}")
 
         expect(getRecipesByIngredient).toHaveBeenCalledTimes(1)
         expect(await screen.findByText(label)).toBeInTheDocument()
