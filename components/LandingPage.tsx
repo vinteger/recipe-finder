@@ -16,6 +16,8 @@ interface Recipe  {
     image: string
 }
 
+export const NO_RECIPES_FOUND = "No recipes found. Re-check spelling.";
+
 const LandingPage = () => {
     const [ingredient, setIngredient] = useState("")
     const [recipes, setRecipes] = useState<Recipe[]>([])
@@ -60,7 +62,7 @@ const LandingPage = () => {
                     </div>
                 ))
             }
-            {noRecipeFoundMessage && <p>No recipes found. Re-check spelling.</p>}
+            {noRecipeFoundMessage && <p>{NO_RECIPES_FOUND}</p>}
         </>
     )
 }
