@@ -49,7 +49,17 @@ const LandingPage = () => {
     return (
         <div className="text-prussian-blue">
             <div className="flex flex-col gap-2 mx-auto md:w-1/2 md:max-w-[500px]">
-                <h1 className="text-5xl self-center mb-4">Recipe Finder</h1>
+                <div className="flex content-baseline self-center gap-x-4">
+                    <Image
+                        src={"/logo.png"}
+                        alt={"recipe finder logo"}
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        style={{width: "auto", height: "auto", maxHeight: "4rem"}}
+                    />
+                    <h1 className="text-5xl self-center">Recipe Finder</h1>
+                </div>
                 <label htmlFor="search">Enter ingredients</label>
                 <input
                     type="text"
