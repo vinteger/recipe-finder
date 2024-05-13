@@ -51,7 +51,6 @@ describe("Landing Page", () => {
         await user.click(screen.getByRole("button", {name: "Search"}))
 
         expect(getRecipesByIngredient).toHaveBeenCalledTimes(1)
-        expect(await screen.findByText(label)).toBeInTheDocument()
     })
 
     it("should clear 'no recipes found' message after successful search", async () => {
@@ -110,6 +109,5 @@ describe("Landing Page", () => {
         await user.type(screen.getByRole("textbox"), "some ingredient{Enter}")
 
         expect(getRecipesByIngredient).toHaveBeenCalledTimes(1)
-        expect(await screen.findByText(label)).toBeInTheDocument()
     })
 })

@@ -9,6 +9,6 @@ describe("Recipes Grid", () => {
 
     expect(screen.queryByText("chicken soup")).toBeInTheDocument();
     expect(screen.queryByAltText("chicken soup")).toBeInTheDocument();
+    expect(screen.getByRole("img")).toHaveAttribute("src", expect.stringContaining("testImage"))
   })
-
 })
